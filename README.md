@@ -1,3 +1,8 @@
+# Build a Blog Aggregator in Typescript
+
+Build an RSS feed aggregator in TypeScript.
+
+This is the starter code used in Boot.dev's [Build a Blog Aggregator in Typescript](https://www.boot.dev/courses/build-blog-aggregator-typescript) course.
 
 # Gator - A CLI RSS Feed Aggregator
 
