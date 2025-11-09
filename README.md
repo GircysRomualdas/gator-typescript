@@ -1,43 +1,47 @@
-# Build a Blog Aggregator in Typescript
+# Gator
 
-Build an RSS feed aggregator in TypeScript.
+Command-line RSS Feed Aggregator built in TypeScript that allows users to subscribe to RSS feeds, fetch posts, and manage subscriptions — all backed by PostgreSQL.
 
-This is the starter code used in Boot.dev's [Build a Blog Aggregator in Typescript](https://www.boot.dev/courses/build-blog-aggregator-typescript) course.
-
-# Gator - A CLI RSS Feed Aggregator
-
-**Gator** is command-line tool written in TypeScript that allows users to subscribe to RSS feeds, store and browse posts, and manage their subscriptions — all backed by a PostgreSQL database.
+This is the starter code used in Boot.dev's [Build a Blog Aggregator in TypeScript](https://www.boot.dev/courses/build-blog-aggregator-typescript) course.
 
 ---
 
-## Prerequisites
+## Requirements
 
-Before running Gator, make sure the following are installed on your system:
-
-- **[Node.js](https://nodejs.org/)**
-- **[PostgreSQL](https://www.postgresql.org/download/)**
+- Node.js 16+
+- PostgreSQL
 
 ---
 
 ## Installation
 
-1. **Clone the repository:**
+1. Clone the Repository
 
-   ```bash
-   clone https://github.com/GircysRomualdas/gator
-   cd gator
-   npm install
-   ```
+2. Install dependencies:
+```bash
+npm install
+```
 
-## Configuration
+3. Install PostgreSQL:  
+```bash
+sudo apt update
+sudo apt install postgresql postgresql-contrib
+```
+4. Configure PostgreSQL:
 
-Gator uses a `.gatorconfig.json` file in the home directory to store:
+```bash
+sudo service postgresql start
+sudo -u postgres psql
+```
 
-- The current user
-- PostgreSQL connection credentials
+Inside the psql shell:
+```sql
+CREATE DATABASE gator;
+ALTER USER postgres PASSWORD 'postgres';
+\q
+```
 
-### Example `.gatorconfig.json`:
-
+5. Create configuration file ~/.gatorconfig.json
 ```json
 {
   "db_url": "postgres://postgres:postgres@localhost:5432/gator?sslmode=disable",
@@ -45,96 +49,138 @@ Gator uses a `.gatorconfig.json` file in the home directory to store:
 }
 ```
 
-Add .gatorconfig.json to ~ (home).
+6. Run migrations:
+```bash
+npm run migrate
+```
 
 ---
 
 ## Usage
 
-Gator supports a variety of CLI commands. After clone, run commands like this:
-
+Run Gator:
 ```bash
 npm run start <command> [arguments]
 ```
 
-### User Management
+### Example Session
 
-- **Register a user**
+#### Reset users:
+```bash
+npm run start reset
+```
 
-  ```bash
-  npm run start register <username>
-  ```
+Output:
+```bash
+All users deleted
+```
 
-- **Login as a user**
+#### Register:
+```bash
+npm run start register kahya
+```
 
-  ```bash
-  npm run start login <username>
-  ```
+Output:
+```bash
+Registered as kahya
+```
 
-- **Delete all user's**
+#### Login:
+```bash
+npm run start login kahya
+```
 
-  ```bash
-  npm run start reset
-  ```
+Output:
+```bash
+Logged in as kahya
+```
 
-- **List all users**
+#### Add feed:
+```bash
+npm run start addfeed "Hacker News RSS" "https://hnrss.org/newest"
+```
 
-  ```bash
-  npm run start users
-  ```
+Output:
+```bash
+Feed Hacker News RSS created successfully
+* ID:            940681df-54b5-4baa-aaa1-11de92751fba
+* Created:       Mon Nov 10 2025 00:44:33 GMT+0200
+* Updated:       Mon Nov 10 2025 00:44:33 GMT+0200
+* name:          Hacker News RSS
+* URL:           https://hnrss.org/newest
+* User:          kahya
+```
 
----
+#### Follow feed:
+```bash
+npm run start follow "https://hnrss.org/newest"
+```
 
-### Feed Management
+Output:
+```bash
+Feed Hacker News RSS followed by user kahya
+```
 
-- **Add a new feed**
+#### View followed feeds:
+```bash
+npm run start following
+```
 
-  ```bash
-  npm run start addfeed <feed-name> <feed-url>
-  ```
+Output:
+```bash
+Feed follows for user kahya:
+followed feed Hacker News RSS
+```
 
-- **List all available feeds**
+#### Aggregate posts:
+```bash
+npm run start agg 5s
+```
 
-  ```bash
-  npm run start feeds
-  ```
+Output:
+```bash
+Collecting feeds every 5s
+Fetched feed:
+Created post: Holocaust Database
+Created post: AI Progress and Recommendations
+Created post: Coxeter Groups
+...
+```
 
-- **Follow a feed**
+#### Browse recent posts:
+```bash
+npm run start browse 3
+```
 
-  ```bash
-  npm run start follow <feed-url>
-  ```
+Output:
+```bash
+Found 3 posts for user kahya
+Sun Nov 09 2025 22:33:48 GMT+0200 from Hacker News RSS
+--- Holocaust Database ---
+Link: https://www.ushmm.org/online/hsv/person_advance_search.php
+=====================================
+Sun Nov 09 2025 22:33:44 GMT+0200 from Hacker News RSS
+--- AI Progress and Recommendations ---
+Link: https://openai.com/index/ai-progress-and-recommendations/
+=====================================
+Sun Nov 09 2025 22:32:23 GMT+0200 from Hacker News RSS
+--- Coxeter Groups ---
+Link: https://arxiv.org/abs/2510.23002
+```
 
-- **Unfollow a feed**
+## Commands
 
-  ```bash
-  npm run start unfollow <feed-url>
-  ```
+| Command | Description |
+|---------|-------------|
+| `register <username>` | Register a new user |
+| `login <username>` | Log in as an existing user |
+| `reset` | Delete all users from the database |
+| `users` | List all registered users |
+| `addfeed <feed-name> <feed-url>` | Add a new RSS feed |
+| `feeds` | List all available feeds |
+| `follow <feed-url>` | Follow a feed |
+| `unfollow <feed-url>` | Unfollow a feed |
+| `following` | List all feeds you are currently following |
+| `agg <interval>` | Aggregate (fetch and store latest posts at a specified interval, e.g., `5s`) |
+| `browse [limit]` | Browse recent posts from feeds you follow (optionally limit results) |
 
-- **List feeds you’re currently following**
-
-  ```bash
-  npm run start following
-  ```
-
----
-
-### Aggregation and Browsing
-
-- **Aggregate (fetch and store posts)**
-
-  ```bash
-  npm run start agg
-  ```
-
-- **Browse posts from feeds you follow**
-
-  ```bash
-  npm run start browse
-  ```
-
-  Optionally, limit the number of results:
-
-  ```bash
-  npm run start browse 5
-  ```
