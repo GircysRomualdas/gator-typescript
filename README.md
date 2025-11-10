@@ -8,7 +8,7 @@ This is the starter code used in Boot.dev's [Build a Blog Aggregator in TypeScri
 
 ## Requirements
 
-- Node.js 16+
+- Node.js 20+
 - PostgreSQL
 
 ---
